@@ -27,7 +27,7 @@ CCR6QKTWZQYW6YUJ7UP7XXZRLWQPFRV6SWBLQS4ZQOSAF4BOUD77OTE2
 
 ### Polkadot Westend Contract
 ```
-[Westend AssetHub Contract Address]
+0xad2a1952c9F3b2DB42e306A71635Fedb570679Db
 ```
 
 ### Bahamut Contract
