@@ -106,10 +106,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - GitHub: [@armsves](https://github.com/armsves)
 - Twitter: [@armsves](https://twitter.com/armsves)
 
-## Acknowledgments
+## Video Demo
 
-- Stellar Development Foundation
-- Aptos Foundation
-- Bahamut Team
-- Polkadot Network
-- All contributors and supporters of the project
+- https://youtu.be/Y4UKeDV8vEY
