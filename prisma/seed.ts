@@ -87,7 +87,7 @@ async function main() {
 
   // Aptos Projects
   const aptosProjects = [
-    {
+            {
       name: 'Panora',
       description: 'Smart DEX Aggregator.',
       website: 'https://panora.exchange/',
@@ -207,7 +207,7 @@ async function main() {
             githubForks: 0,
             twitterFollowers: 0,
             projectFreshness: 0
-          }
+                }
         }
       }
     });
@@ -219,8 +219,8 @@ async function main() {
           projectId: createdProject.id,
           userId: dummyUsers[i].id,
           value: Math.round(getRandomRating() * 2) / 2, // Round to nearest 0.5
-        }
-      });
+            }
+        });
     }
   }
 
