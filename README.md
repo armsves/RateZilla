@@ -54,8 +54,8 @@ CCR6QKTWZQYW6YUJ7UP7XXZRLWQPFRV6SWBLQS4ZQOSAF4BOUD77OTE2
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/armsve/StellarProductHunt.git
-cd StellarProductHunt
+git clone https://github.com/armsves/RateZilla.git
+cd RateZilla
 ```
 
 2. Install dependencies:
@@ -103,8 +103,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-- GitHub: [@armsve](https://github.com/armsve)
-- Twitter: [@armsves](https://x.com/armsves)
+- GitHub: [@armsves](https://github.com/armsves)
+- Twitter: [@armsves](https://twitter.com/armsves)
 
 ## Acknowledgments
 
