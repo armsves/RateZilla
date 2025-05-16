@@ -58,11 +58,11 @@ function VoteModal({ open, onClose, onSubmit, currentRating }: {
           ))}
         </div>
         <button
-          className="btn-primary w-full mt-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={selected === 0}
           onClick={() => { onSubmit(selected); onClose(); }}
         >
-          Submit
+          Submit Rating
         </button>
       </div>
     </div>
@@ -253,7 +253,7 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
           
           <div className="mt-4 flex justify-between items-center">
             <button
-              className="btn-primary text-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               onClick={() => { setVotingProject(project); setVoteModalOpen(true); }}
             >
               Vote
@@ -264,7 +264,7 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
                   href={project.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground/60 hover:text-primary transition-colors"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
                   title="Visit Website"
                 >
                   <FaGlobe className="h-5 w-5" />
@@ -275,7 +275,7 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground/60 hover:text-primary transition-colors"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
                   title={`${project.metrics?.githubStars || 0} GitHub Stars`}
                 >
                   <FaGithub className="h-5 w-5" />
@@ -286,7 +286,7 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
                   href={project.twitterUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground/60 hover:text-primary transition-colors"
+                  className="text-gray-600 hover:text-blue-600 transition-colors"
                   title={`${project.metrics?.twitterFollowers || 0} Twitter Followers`}
                 >
                   <FaXTwitter className="h-5 w-5" />
