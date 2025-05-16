@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  description   String?
+  website       String?
+  githubUrl     String?        @map("github_url")
+  twitterUrl    String?        @map("twitter_url")
+  logoUrl       String?        @map("logo_url")
+  blockchain    String         @default("stellar")
+  contracts     Contract[]
+  socialMetrics SocialMetrics?
+  votes         Vote[]
+  comments      Comment[]
+  metrics       ProjectMetrics?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
+model Contract {
+  id              Int      @id @default(autoincrement())
+  projectId       Int      @map("project_id")
+  name            String
+  address         String   @unique
+  type            String
+  interactions    Int      @default(0)
+  lastInteraction DateTime @default(now()) @map("last_interaction")
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([address])
+  @@map("contracts")
+}
+
+model SocialMetrics {
+  id                Int      @id @default(autoincrement())
+  projectId         Int      @unique @map("project_id")
+  githubStars       Int      @default(0) @map("github_stars")
+  githubForks       Int      @default(0) @map("github_forks")
+  githubLastUpdate  DateTime @default(now()) @map("github_last_update")
+  twitterFollowers  Int      @default(0) @map("twitter_followers")
+  twitterLastUpdate DateTime @default(now()) @map("twitter_last_update")
+  projectFreshness  Float    @default(0) @map("project_freshness")
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectFreshness(sort: Desc)])
+  @@map("social_metrics")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  stellarAddress String  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  votes         Vote[]
+  comments      Comment[]
+  metrics       UserMetrics?
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  projectId Int
+  userId    String
+  value     Int      // 1 to 5 for star rating
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  projectId Int
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model ProjectMetrics {
+  id                String  @id @default(cuid())
+  projectId         Int     @unique
+  githubStars       Int     @default(0)
+  twitterFollowers  Int     @default(0)
+  totalVotes        Int     @default(0)
+  averageRating     Float   @default(0)
+  project           Project @relation(fields: [projectId], references: [id])
+}
+
+model UserMetrics {
+  id                String  @id @default(cuid())
+  userId            String  @unique
+  totalVotes        Int     @default(0)
+  totalComments     Int     @default(0)
+  reputationScore   Float   @default(0)
+  user              User    @relation(fields: [userId], references: [id])
+} 

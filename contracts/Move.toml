@@ -1,0 +1,9 @@
+[package]
+name = "project_rating"
+version = "1.0.0"
+
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework", rev = "e0c5c1c8c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0" }
+
+[addresses]
+project_rating = "0x5f6532c97b22731de526f57d8a7f159ec21154ef3b6c0f5f09a9fb0f7abc3122" 
