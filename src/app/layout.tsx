@@ -6,12 +6,13 @@ import { Footer } from '@/components/Footer';
 import { AppProvider } from '@/components/AppProvider';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ratezilla - Discover the Best of Web3",
-  description: "Explore trending products across multiple blockchains, connect your wallet, and join the future of decentralized applications.",
+  title: "RateZilla - Web3 Project Discovery Platform",
+  description: "Discover, rate, and review Web3 projects across multiple blockchain ecosystems including Stellar, Aptos, Bahamut, and Polkadot.",
 };
 
 export default function RootLayout({
@@ -36,6 +37,7 @@ export default function RootLayout({
           </div>
           <ToastContainer position="bottom-right" />
         </AppProvider>
+        <Toaster />
       </body>
     </html>
   );
