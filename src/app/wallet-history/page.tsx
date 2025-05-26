@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { xdr, StrKey } from '@stellar/stellar-sdk';
-import * as Client from '../../../packages/stellarContract/dist/index.js';
+//import * as Client from '../../../packages/stellarContract/dist/index.js';
 
 interface ContractInteraction {
     contract_address: string;
@@ -132,8 +132,10 @@ const WalletHistory = () => {
     useEffect(() => {
         const readContract = async () => {
             try {
-                const contract = new Client.Client({
-                    ...Client.networks.testnet,
+                var StellarSdk = require("stellar-sdk");
+                const contract = new StellarSdk.Contract.Client({
+                //const contract = new Client.Client({
+                    ...StellarSdk.networks.testnet,
                     rpcUrl: 'https://soroban-testnet.stellar.org:443'
                 });
                 
