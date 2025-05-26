@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { xdr, StrKey } from '@stellar/stellar-sdk';
 //import * as Client from '../../../packages/stellarContract/dist/index.js';
+import * as StellarSdk from '@stellar/stellar-sdk';
 
 interface ContractInteraction {
     contract_address: string;
