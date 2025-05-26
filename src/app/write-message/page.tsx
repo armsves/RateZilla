@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-//import * as Client from '../../../packages/stellarContract/dist/index.js';
+import * as Client from '../../../packages/stellarContract/dist/index.js';
 import { useAppContext } from '@/app/context';
 import { StellarWalletsKit, WalletNetwork, FREIGHTER_ID, allowAllModules } from '@creit.tech/stellar-wallets-kit';
 import { TransactionBuilder, Networks, SorobanRpc, BASE_FEE, Contract, Transaction, xdr, Address } from '@stellar/stellar-sdk';
@@ -12,7 +12,7 @@ const kit = new StellarWalletsKit({
     modules: allowAllModules(),
 });
 
-//const rpc = new SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
+const rpc = new SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
 
 const WriteMessage = () => {
     const { activePubKey } = useAppContext();
@@ -33,7 +33,7 @@ const WriteMessage = () => {
 
         try {
             setLoading(true);
-            /*
+            
             const contract = new Client.Client({
                 ...Client.networks.testnet,
                 rpcUrl: 'https://soroban-testnet.stellar.org:443'
@@ -59,7 +59,7 @@ const WriteMessage = () => {
 
             // Submit the signed transaction
             const result = await rpc.sendTransaction(tx);
-            console.log('Transaction result:', result);*/
+            console.log('Transaction result:', result);
 
             const CONTRACT_ID = "CAZH5SRKC6S5K7KW4IXXYPMIXDDT33VS6JPXHHCDPLBMUEQ7O2523ZCS";
             const NETWORK_PASSPHRASE = Networks.TESTNET;
