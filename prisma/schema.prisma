@@ -109,4 +109,15 @@ model UserMetrics {
   totalComments     Int     @default(0)
   reputationScore   Float   @default(0)
   user              User    @relation(fields: [userId], references: [id])
-} 
+}
+
+// Preserve existing ERC20Coin table
+model ERC20Coin {
+  id       Int    @id @default(autoincrement())
+  name     String
+  symbol   String
+  address  String @unique
+  chain    String
+  exchange String
+  url      String
+}

@@ -1,28 +1,76 @@
 "use client";
 
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface ProjectFormData {
   name: string;
   description: string;
   githubUrl: string;
   twitterUrl: string;
-  websiteUrl: string;
+  website: string;
+  logoUrl: string;
 }
 
-const AdminProjectForm = () => {
+interface AdminProjectFormProps {
+  onProjectAdded?: () => void;
+}
+
+const AdminProjectForm = ({ onProjectAdded }: AdminProjectFormProps) => {
   const [formData, setFormData] = useState<ProjectFormData>({
     name: '',
     description: '',
     githubUrl: '',
     twitterUrl: '',
-    websiteUrl: '',
+    website: '',
+    logoUrl: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement project creation/update logic
-    console.log('Form submitted:', formData);
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/admin/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          blockchain: 'stellar', // Always set to stellar since we're focusing only on Stellar
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create project');
+      }
+
+      const data = await response.json();
+      toast.success('Project created successfully!');
+      
+      // Reset form
+      setFormData({
+        name: '',
+        description: '',
+        githubUrl: '',
+        twitterUrl: '',
+        website: '',
+        logoUrl: '',
+      });
+
+      // Notify parent component that a project was added
+      if (onProjectAdded) {
+        onProjectAdded();
+      }
+    } catch (error) {
+      console.error('Error creating project:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create project');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,7 +93,7 @@ const AdminProjectForm = () => {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="input"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           required
         />
       </div>
@@ -59,7 +107,7 @@ const AdminProjectForm = () => {
           name="description"
           value={formData.description}
           onChange={handleChange}
-          className="input min-h-[100px]"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
           required
         />
       </div>
@@ -74,7 +122,7 @@ const AdminProjectForm = () => {
           name="githubUrl"
           value={formData.githubUrl}
           onChange={handleChange}
-          className="input"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           placeholder="https://github.com/username/repo"
         />
       </div>
@@ -89,29 +137,48 @@ const AdminProjectForm = () => {
           name="twitterUrl"
           value={formData.twitterUrl}
           onChange={handleChange}
-          className="input"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           placeholder="https://twitter.com/username"
         />
       </div>
 
       <div>
-        <label htmlFor="websiteUrl" className="block text-sm font-medium mb-1">
+        <label htmlFor="website" className="block text-sm font-medium mb-1">
           Website URL
         </label>
         <input
           type="url"
-          id="websiteUrl"
-          name="websiteUrl"
-          value={formData.websiteUrl}
+          id="website"
+          name="website"
+          value={formData.website}
           onChange={handleChange}
-          className="input"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           placeholder="https://example.com"
         />
       </div>
 
+      <div>
+        <label htmlFor="logoUrl" className="block text-sm font-medium mb-1">
+          Logo URL
+        </label>
+        <input
+          type="url"
+          id="logoUrl"
+          name="logoUrl"
+          value={formData.logoUrl}
+          onChange={handleChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          placeholder="https://example.com/logo.png"
+        />
+      </div>
+
       <div className="flex justify-end">
-        <button type="submit" className="btn-primary">
-          Add Project
+        <button 
+          type="submit" 
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Adding...' : 'Add Project'}
         </button>
       </div>
     </form>

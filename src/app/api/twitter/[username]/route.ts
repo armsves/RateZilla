@@ -1,15 +1,31 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(
   request: Request,
   { params }: { params: { username: string } }
 ) {
   try {
     const username = params.username;
+    console.log('Fetching Twitter data for username:', username);
+    
+    // Check if we have Twitter API credentials
+    if (!process.env.TWITTER_BEARER_TOKEN) {
+      console.warn('No TWITTER_BEARER_TOKEN found in environment variables. Returning mock data.');
+      
+      // Return mock data for development
+      return NextResponse.json({
+        followers: Math.floor(Math.random() * 5000) + 100,
+        lastUpdate: new Date().toISOString(),
+        isMockData: true,
+      });
+    }
     
     // First get the user ID with public metrics
     const userResponse = await fetch(
-      `https://api.x.com/2/users/by/username/${username}?user.fields=public_metrics,created_at`,
+      `https://api.twitter.com/2/users/by/username/${username}?user.fields=public_metrics,created_at`,
       {
         headers: {
           'Authorization': `Bearer ${process.env.TWITTER_BEARER_TOKEN}`,
@@ -17,9 +33,21 @@ export async function GET(
       }
     );
 
+    if (userResponse.status === 404) {
+      console.error('Twitter user not found:', username);
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
     if (!userResponse.ok) {
-      console.error('Twitter API error:', await userResponse.text());
-      throw new Error('Failed to fetch Twitter user data');
+      const errorText = await userResponse.text();
+      console.error(`Twitter API error (${userResponse.status}):`, errorText);
+      return NextResponse.json(
+        { error: `Twitter API error: ${userResponse.status}` },
+        { status: userResponse.status }
+      );
     }
 
     const userData = await userResponse.json();
@@ -33,6 +61,7 @@ export async function GET(
     }
 
     const userId = userData.data.id;
+    console.log('Twitter user ID retrieved:', userId);
 
     // Then get the user's tweets
     const tweetsResponse = await fetch(
@@ -45,16 +74,23 @@ export async function GET(
     );
 
     if (!tweetsResponse.ok) {
-      console.error('Twitter API error:', await tweetsResponse.text());
-      throw new Error('Failed to fetch Twitter tweets data');
+      console.error(`Twitter tweets API error (${tweetsResponse.status}):`, await tweetsResponse.text());
+      // Continue with user data only
+      return NextResponse.json({
+        followers: userData.data.public_metrics?.followers_count || 0,
+        lastUpdate: userData.data.created_at,
+        name: userData.data.name,
+      });
     }
 
     const tweetsData = await tweetsResponse.json();
     const lastTweet = tweetsData.data?.[0];
+    console.log('Twitter data retrieved successfully for:', username);
     
     return NextResponse.json({
       followers: userData.data.public_metrics?.followers_count || 0,
       lastUpdate: lastTweet?.created_at || userData.data.created_at,
+      name: userData.data.name,
     });
   } catch (error) {
     console.error('Error fetching Twitter data:', error);

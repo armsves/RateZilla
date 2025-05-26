@@ -24,6 +24,8 @@ interface Project {
 interface SocialData {
   githubLastUpdate?: string;
   twitterLastUpdate?: string;
+  mostRecentRepo?: string;
+  repoCount?: number;
 }
 
 interface ProjectListProps {
@@ -78,13 +80,68 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
   const [votingProject, setVotingProject] = useState<Project | null>(null);
 
   const extractGithubRepo = (url: string) => {
-    const match = url.match(/github\.com\/([^/]+\/[^/]+)/);
-    return match ? match[1] : null;
+    if (!url) return null;
+    
+    try {
+      // Handle different GitHub URL formats
+      let match;
+      
+      // Format: https://github.com/username/repo
+      match = url.match(/github\.com\/([^/]+)\/([^/#?]+)/);
+      if (match) {
+        return `${match[1]}/${match[2]}`;
+      }
+      
+      // If it's already in owner/repo format
+      if (url.split('/').length === 2 && !url.includes('://')) {
+        return url;
+      }
+      
+      // If it's an organization URL: https://github.com/organization
+      match = url.match(/github\.com\/([^/#?]+)/);
+      if (match && match[1]) {
+        return match[1];
+      }
+      
+      console.warn('Could not extract GitHub repo from URL:', url);
+      return null;
+    } catch (error) {
+      console.error('Error extracting GitHub repo:', error);
+      return null;
+    }
   };
 
   const extractTwitterUsername = (url: string) => {
-    const match = url.match(/twitter\.com\/([^/]+)|x\.com\/([^/]+)/);
-    return match ? (match[1] || match[2]) : null;
+    if (!url) return null;
+    
+    try {
+      // Handle twitter.com and x.com URLs
+      const match = url.match(/(?:twitter|x)\.com\/([^/?#]+)/);
+      return match ? match[1] : null;
+    } catch (error) {
+      console.error('Error extracting Twitter username:', error);
+      return null;
+    }
+  };
+
+  const isGithubOrg = (url: string) => {
+    if (!url) return false;
+    
+    try {
+      // Check if it's a direct organization name (no specific repo)
+      if (!url.includes('/')) return true;
+      
+      // Check if URL has a specific repo or just an organization
+      // This regex matches organization URLs (those ending without another path segment)
+      // Examples:
+      // https://github.com/organization - match
+      // https://github.com/organization/ - match
+      // https://github.com/organization/repo - no match
+      const match = url.match(/github\.com\/([^/]+)\/?$/);
+      return !!match;
+    } catch (error) {
+      return false;
+    }
   };
 
   const fetchSocialData = async (project: Project) => {
@@ -94,18 +151,45 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
 
     try {
       if (githubRepo) {
-        const response = await fetch(`/api/github/${githubRepo}`);
+        console.log(`Fetching GitHub data for project ${project.name}, repo: ${githubRepo}`);
+        
+        // Determine if this is an organization or a specific repo
+        const isOrg = isGithubOrg(project.githubUrl);
+        
+        const endpoint = isOrg 
+          ? `/api/github/org/${encodeURIComponent(githubRepo)}` 
+          : `/api/github/${encodeURIComponent(githubRepo)}`;
+        
+        const response = await fetch(endpoint);
+        
         if (response.ok) {
           const githubData = await response.json();
           data.githubLastUpdate = githubData.lastUpdate;
+          
+          // For organizations, store the most recent repo and repo count
+          if (isOrg) {
+            data.mostRecentRepo = githubData.mostRecentRepo;
+            data.repoCount = githubData.repoCount;
+          }
+          
+          console.log(`GitHub data fetched successfully for ${project.name}`);
+        } else {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error(`Failed to fetch GitHub data for ${project.name}:`, errorData.error);
         }
       }
 
       if (twitterUsername) {
-        const response = await fetch(`/api/twitter/${twitterUsername}`);
+        console.log(`Fetching Twitter data for project ${project.name}, username: ${twitterUsername}`);
+        const response = await fetch(`/api/twitter/${encodeURIComponent(twitterUsername)}`);
+        
         if (response.ok) {
           const twitterData = await response.json();
           data.twitterLastUpdate = twitterData.lastUpdate;
+          console.log(`Twitter data fetched successfully for ${project.name}`);
+        } else {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error(`Failed to fetch Twitter data for ${project.name}:`, errorData.error);
         }
       }
 
@@ -114,15 +198,28 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
         [project.id]: data
       }));
     } catch (error) {
-      console.error('Error fetching social data:', error);
+      console.error(`Error fetching social data for project ${project.name}:`, error);
     }
   };
 
   const isCodeActive = (project: Project) => {
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-    const githubDate = new Date(socialData[project.id]?.githubLastUpdate || '');
-    return githubDate > threeMonthsAgo;
+    if (!socialData[project.id]?.githubLastUpdate) return null;
+    
+    const now = new Date();
+    const lastUpdate = new Date(socialData[project.id]?.githubLastUpdate || '');
+    
+    // Calculate months since last update
+    const monthsSinceUpdate = (now.getFullYear() - lastUpdate.getFullYear()) * 12 + 
+                             (now.getMonth() - lastUpdate.getMonth());
+    
+    // Return color code based on freshness
+    if (monthsSinceUpdate < 6) {
+      return 'green'; // Less than 6 months - green
+    } else if (monthsSinceUpdate < 12) {
+      return 'blue'; // 6-12 months - blue
+    } else {
+      return 'red'; // More than 1 year - red
+    }
   };
 
   const isSocialActive = (project: Project) => {
@@ -216,11 +313,41 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
             </div>
             {/* Code Activity Indicator */}
             <div className="relative group">
-              {isCodeActive(project) ? (
-                <FaCode className="h-5 w-5 text-green-500" title="Active code (updated in last 3 months)" />
+              {isCodeActive(project) === 'green' ? (
+                <FaCode 
+                  className="h-5 w-5 text-green-500"
+                  title={socialData[project.id]?.mostRecentRepo 
+                    ? `Organization active: ${socialData[project.id].repoCount} repos, most recent update in ${socialData[project.id].mostRecentRepo}`
+                    : "Recently active (updated in last 6 months)"}
+                />
+              ) : isCodeActive(project) === 'blue' ? (
+                <FaCode 
+                  className="h-5 w-5 text-blue-500" 
+                  title={socialData[project.id]?.mostRecentRepo 
+                    ? `Organization semi-active: ${socialData[project.id].repoCount} repos, most recent update in ${socialData[project.id].mostRecentRepo}`
+                    : "Semi-active (updated in last 6-12 months)"}
+                />
+              ) : isCodeActive(project) === 'red' ? (
+                <FaCode 
+                  className="h-5 w-5 text-red-500" 
+                  title={socialData[project.id]?.mostRecentRepo 
+                    ? `Organization inactive: ${socialData[project.id].repoCount} repos, most recent update in ${socialData[project.id].mostRecentRepo}`
+                    : "Inactive (no updates in over a year)"}
+                />
               ) : (
-                <FaCode className="h-5 w-5 text-gray-400" title="Inactive code (no updates in last 3 months)" />
+                <FaCode className="h-5 w-5 text-gray-400" title="No update information available" />
               )}
+              <div className="absolute -top-2 right-6 hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded-md w-48 z-10">
+                {socialData[project.id]?.mostRecentRepo 
+                  ? `Organization with ${socialData[project.id].repoCount} repos. Most recent activity in ${socialData[project.id].mostRecentRepo}` 
+                  : isCodeActive(project) === 'green'
+                    ? "Updated in the last 6 months"
+                    : isCodeActive(project) === 'blue'
+                      ? "Updated 6-12 months ago"
+                      : isCodeActive(project) === 'red'
+                        ? "Not updated in over a year"
+                        : "No update information available"}
+              </div>
             </div>
             {/* Social Media Activity Indicator */}
             <div className="relative group">

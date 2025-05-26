@@ -85,119 +85,8 @@ async function main() {
     }
   ];
 
-  // Aptos Projects
-  const aptosProjects = [
-            {
-      name: 'Panora',
-      description: 'Smart DEX Aggregator.',
-      website: 'https://panora.exchange/',
-      githubUrl: 'https://github.com/PanoraExchange',
-      twitterUrl: 'https://x.com/PanoraExchange',
-      logoUrl: 'https://media.aptosfoundation.org/1710268412-photo_2024-03-12_11-32-47.jpg?auto=format&fit=crop&h=344&w=344',
-      blockchain: 'aptos'
-    },
-    {
-      name: 'Aptos Art Museum',
-      description: 'The first metaverse art gallery in the Aptos ecosystem',
-      website: 'https://game.aptosartmuseum.online/',
-      githubUrl: 'https://github.com/10ur5en/aptos-art-museum',
-      twitterUrl: 'https://x.com/AptosArtMuseum',
-      logoUrl: 'https://media.aptosfoundation.org/1698966475-project-icon_aptos-art-museum.jpg?auto=format&fit=crop&h=344&w=344',
-      blockchain: 'aptos'
-    },
-    {
-      name: 'Cellana Finance',
-      description: 'The first Aptos DEX which uses the Ve(3,3) Model in Move.',
-      website: 'https://cellana.finance/',
-      githubUrl: 'https://github.com/Cellana-Finance',
-      twitterUrl: 'https://x.com/CellanaFinance',
-      logoUrl: 'https://media.aptosfoundation.org/1720457115-project-icon_cellana-finance.png?auto=format&fit=crop&h=344&w=344',
-      blockchain: 'aptos'
-    },
-    {
-      name: 'Econia',
-      description: 'Hyper-parallelized On-chain Order Book for the Aptos Network Blockchain',
-      website: 'https://econialabs.com/',
-      githubUrl: 'https://github.com/econia-labs/econia',
-      twitterUrl: 'https://x.com/EconiaLabs',
-      logoUrl: 'https://media.aptosfoundation.org/1686929335-econia.jpeg?auto=format&fit=crop&h=344&w=344',
-      blockchain: 'aptos'
-    },
-    {
-      name: 'Werewolf vs Witch',
-      description: 'Decentralized NFT War Game on Aptos',
-      website: 'https://werewolfandwitch.xyz/',
-      githubUrl: 'https://github.com/werewolfandwitch/aptos-werewolfandwitch',
-      twitterUrl: 'https://x.com/AWW_xyz',
-      logoUrl: 'https://media.aptosfoundation.org/1687173589-werewolf-vs-witch.jpeg?auto=format&fit=crop&h=344&w=344',
-      blockchain: 'aptos'
-    }
-  ];
-
-  // Bahamut Projects
-  const bahamutProjects = [
-    {
-      name: 'Rubic',
-      description: 'DEX aggregator on the Bahamut blockchain',
-      website: 'https://rubic.exchange/',
-      githubUrl: 'https://github.com/Cryptorubic',
-      twitterUrl: 'https://x.com/CryptoRubic',
-      logoUrl: 'https://rubic.exchange/assets/images/logo.svg',
-      blockchain: 'bahamut'
-    },
-    {
-      name: '8Legends',
-      description: '8Legends is an NFT marketplace on the Bahamut blockchain',
-      website: 'https://8legends.ai/',
-      githubUrl: 'https://github.com/',
-      twitterUrl: 'https://x.com/ArtLegends8',
-      logoUrl: 'https://8legends.ai/webp/logo.webp',
-      blockchain: 'bahamut'
-    },
-    {
-      name: 'Symbiosis',
-      description: 'Symbiosis Finance is a cross-chain bridge that supports the Bahamut blockchain',
-      website: 'https://symbiosis.finance/',
-      githubUrl: 'https://docs.symbiosis.finance/',
-      twitterUrl: 'https://x.com/symbiosis_fi',
-      logoUrl: 'https://docs.symbiosis.finance/~gitbook/image?url=https%3A%2F%2F1179234091-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252F-MbqmbXNUH5sa4BvYwD0%252Ficon%252F7UCKgV59LkQo8gIo53PP%252Flogo%2520purple-solo.jpg%3Falt%3Dmedia%26token%3Db34b3705-7644-4baa-a2e2-65a57962ffd6&width=32&dpr=2&quality=100&sign=313adca5&sv=2',
-      blockchain: 'bahamut'
-    }
-  ];
-
-  // Polkadot Projects
-  const polkadotProjects = [
-    {
-      name: 'Hydration',
-      description: 'DEX for low-slippage trades',
-      website: 'https://hydration.net/',
-      githubUrl: 'https://github.com/galacticcouncil',
-      twitterUrl: 'https://x.com/hydration_net',
-      logoUrl: 'https://hydration.net/_next/static/media/logo.3349328f.svg',
-      blockchain: 'polkadot'
-    },
-    {
-      name: 'Hyperbridge',
-      description: 'Verifiable Interoperability',
-      website: 'https://hyperbridge.network/',
-      githubUrl: 'https://github.com/polytope-labs/hyperbridge',
-      twitterUrl: 'https://x.com/hyperbridge',
-      logoUrl: 'https://hyperbridge.network/_nuxt/logo.b7UY1T-8.svg',
-      blockchain: 'polkadot'
-    },
-    {
-      name: 'Bitfrost',
-      description: 'One Stake Endless Opportunities',
-      website: 'https://www.bifrost.io/',
-      githubUrl: 'https://github.com/bifrost-io',
-      twitterUrl: 'https://x.com/Bifrost',
-      logoUrl: 'https://www.bifrost.io/images/v4/logo.svg',
-      blockchain: 'polkadot'
-    }
-  ];
-
   // Add all projects with random ratings
-  for (const project of [...stellarProjects, ...aptosProjects, ...bahamutProjects, ...polkadotProjects]) {
+  for (const project of stellarProjects) {
     const createdProject = await prisma.project.create({
       data: {
         ...project,
@@ -224,7 +113,7 @@ async function main() {
     }
   }
 
-  console.log('Database has been seeded with projects and random ratings. 🌱');
+  console.log('Database has been seeded with Stellar projects and random ratings. 🌱');
 }
 
 main()

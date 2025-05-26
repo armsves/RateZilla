@@ -51,10 +51,6 @@ const WalletConnect = () => {
     try {
       setIsConnecting(true);
       await kit.openModal({
-        modalDialogStyles: {
-          backgroundColor: "#ffffff",
-          color: '#fff',
-        },
         onWalletSelected: async (wallet: ISupportedWallet) => {
           try {
             kit.setWallet(wallet.id);

@@ -8,15 +8,9 @@ const Navbar = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <nav className="bg-card border-b border-border">
+    <nav className="bg-card">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-primary">
-              Stellar Product Hunt
-            </Link>
-          </div>
-          
+        <div className="flex h-16 items-center justify-between">     
           <div className="flex items-center space-x-4">
             <Link
               href="/admin"

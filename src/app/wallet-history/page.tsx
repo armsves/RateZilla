@@ -224,7 +224,23 @@ const WalletHistory = () => {
         fetchTransactions();
     }, []);
 
-/
+    useEffect(() => {
+        const readContract = async () => {
+            try {
+                const contract = new Client.Client({
+                    ...Client.networks.testnet,
+                    rpcUrl: 'https://soroban-testnet.stellar.org:443'
+                });
+                
+                const { result } = await contract.read_latest({});
+                console.log('result: ', result);
+            } catch (error) {
+                console.error('Error reading contract:', error);
+            }
+        };
+
+        readContract();
+    }, []);
 
     return (
         <div className="container mx-auto px-4 py-8">

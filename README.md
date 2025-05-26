@@ -1,43 +1,25 @@
-# Ratezilla - Web3 Project Discovery Platform
+# StellarProductHunt - Web3 Project Discovery Platform
 
-Ratezilla is a decentralized platform for discovering, rating, and reviewing Web3 projects across multiple blockchain ecosystems. Built with Next.js and TypeScript, it provides a seamless experience for users to explore and evaluate projects on Stellar, Aptos, Bahamut, and Polkadot networks.
+StellarProductHunt is a decentralized platform for discovering, rating, and reviewing Web3 projects on the Stellar blockchain. Built with Next.js and TypeScript, it provides a seamless experience for users to explore and evaluate projects on the Stellar network.
 
 ## Features
 
-- 🔍 Cross-chain project discovery
+- 🔍 Project discovery on Stellar
 - ⭐ Project rating and review system
-- 💼 Multi-chain wallet integration
+- 💼 Stellar wallet integration
 - 📊 Social metrics integration (GitHub, Twitter)
 - 🎯 Project activity tracking
 - 🔐 Secure wallet connections
 
-## Supported Blockchains
+## Supported Blockchain
 
 - **Stellar**: Fast, secure, and low-cost blockchain for payments and tokenization
-- **Aptos**: Layer 1 blockchain built for safety, scalability, and reliability
-- **Bahamut**: Eco-friendly blockchain platform for DeFi and NFTs
-- **Polkadot**: Multi-chain network enabling cross-chain interoperability
 
-## Smart Contracts
+## Smart Contract
 
 ### Stellar Contract
 ```
 CCR6QKTWZQYW6YUJ7UP7XXZRLWQPFRV6SWBLQS4ZQOSAF4BOUD77OTE2
-```
-
-### Polkadot Westend Contract
-```
-0xad2a1952c9F3b2DB42e306A71635Fedb570679Db
-```
-
-### Bahamut Contract
-```
-0x4706EFBfD1b0dEf4F426C000B233232B7d4b78F4
-```
-
-### Aptos Contract
-```
-0x5f6532c97b22731de526f57d8a7f159ec21154ef3b6c0f5f09a9fb0f7abc3122
 ```
 
 ## Tech Stack
@@ -45,7 +27,6 @@ CCR6QKTWZQYW6YUJ7UP7XXZRLWQPFRV6SWBLQS4ZQOSAF4BOUD77OTE2
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS
 - **Wallet Integration**: 
   - Stellar: @creit.tech/stellar-wallets-kit
-  - EVM Chains: @rainbow-me/rainbowkit, wagmi
 - **State Management**: React Query
 - **Styling**: Tailwind CSS, Framer Motion
 - **Notifications**: React Toastify
@@ -54,8 +35,8 @@ CCR6QKTWZQYW6YUJ7UP7XXZRLWQPFRV6SWBLQS4ZQOSAF4BOUD77OTE2
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/armsves/RateZilla.git
-cd RateZilla
+git clone https://github.com/armsves/StellarProductHunt.git
+cd StellarProductHunt
 ```
 
 2. Install dependencies:
@@ -81,9 +62,6 @@ npm run dev
 Create a `.env.local` file with the following variables:
 
 ```env
-# WalletConnect Project ID
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_project_id
-
 # API Keys (if needed)
 GITHUB_API_KEY=your_github_api_key
 TWITTER_API_KEY=your_twitter_api_key
@@ -105,14 +83,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - GitHub: [@armsves](https://github.com/armsves)
 - Twitter: [@armsves](https://twitter.com/armsves)
-
-## Acknowledgments
-
-- Stellar Development Foundation
-- Aptos Foundation
-- Bahamut Team
-- Polkadot Network
-- All contributors and supporters of the project
 
 ## Video Demo
 
