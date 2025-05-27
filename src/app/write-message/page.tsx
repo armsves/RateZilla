@@ -12,8 +12,6 @@ const kit = new StellarWalletsKit({
     modules: allowAllModules(),
 });
 
-//const rpc = new SorobanRpc.Server('https://soroban-testnet.stellar.org:443');
-
 const WriteMessage = () => {
     const { activePubKey } = useAppContext();
     const [title, setTitle] = useState('');
