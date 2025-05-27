@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 //import * as Client from '../../../packages/stellarContract/dist/index.js';
 import { useAppContext } from '@/app/context';
 import { StellarWalletsKit, WalletNetwork, FREIGHTER_ID, allowAllModules } from '@creit.tech/stellar-wallets-kit';
-import { TransactionBuilder, Networks, SorobanRpc, BASE_FEE, Contract, Transaction, xdr, Address } from '@stellar/stellar-sdk';
+import { TransactionBuilder, Networks, Rpc, BASE_FEE, Contract, Transaction, xdr, Address } from '@stellar/stellar-sdk';
 
 const kit = new StellarWalletsKit({
     network: WalletNetwork.TESTNET,
@@ -65,7 +65,8 @@ const WriteMessage = () => {
             const NETWORK_PASSPHRASE = Networks.TESTNET;
             const SOROBAN_URL = "https://soroban-testnet.stellar.org:443";
             const author = new Address(activePubKey);
-            const server = new SorobanRpc.Server(SOROBAN_URL);
+            //const server = new Soroban.Server(SOROBAN_URL);
+            const server = new Rpc.Server(SOROBAN_URL);
             const account = await server.getAccount(activePubKey);
       
             const contract2 = new Contract(CONTRACT_ID);
