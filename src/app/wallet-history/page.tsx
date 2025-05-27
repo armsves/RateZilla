@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { xdr, StrKey } from '@stellar/stellar-sdk';
+//import { xdr, StrKey } from '@stellar/stellar-sdk';
 //import * as Client from '../../../packages/stellarContract/dist/index.js';
 import * as StellarSdk from '@stellar/stellar-sdk';
 
@@ -39,19 +39,19 @@ const WalletHistory = () => {
     // Simplified function that just checks if a transaction has invokeHostFunction operations
     const hasInvokeHostFunction = (envelopeXDR: string): boolean => {
         try {
-            const txEnvelope = xdr.TransactionEnvelope.fromXDR(Buffer.from(envelopeXDR, 'base64'));
+            const txEnvelope = StellarSdk.xdr.TransactionEnvelope.fromXDR(Buffer.from(envelopeXDR, 'base64'));
             
             let operations;
             const switchValue = txEnvelope.switch();
             
-            if (switchValue === xdr.EnvelopeType.envelopeTypeTx()) {
+            if (switchValue === StellarSdk.xdr.EnvelopeType.envelopeTypeTx()) {
                 operations = txEnvelope.v1().tx().operations();
-            } else if (switchValue === xdr.EnvelopeType.envelopeTypeTxV0()) {
+            } else if (switchValue === StellarSdk.xdr.EnvelopeType.envelopeTypeTxV0()) {
                 operations = txEnvelope.v0().tx().operations();
-            } else if (switchValue === xdr.EnvelopeType.envelopeTypeTxFeeBump()) {
+            } else if (switchValue === StellarSdk.xdr.EnvelopeType.envelopeTypeTxFeeBump()) {
                 const feeBumpTx = txEnvelope.feeBump();
                 const innerTx = feeBumpTx.tx().innerTx();
-                if (innerTx.switch() === xdr.EnvelopeType.envelopeTypeTx()) {
+                if (innerTx.switch() === StellarSdk.xdr.EnvelopeType.envelopeTypeTx()) {
                     operations = innerTx.v1().tx().operations();
                 } else {
                     return false;
@@ -60,8 +60,8 @@ const WalletHistory = () => {
                 return false;
             }
 
-            return operations.some((op: xdr.Operation) => 
-                op.body().switch() === xdr.OperationType.invokeHostFunction()
+            return operations.some((op: StellarSdk.xdr.Operation) => 
+                op.body().switch() === StellarSdk.xdr.OperationType.invokeHostFunction()
             );
         } catch (err) {
             console.error('Error checking for invokeHostFunction:', err);
