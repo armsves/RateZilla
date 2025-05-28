@@ -87,3 +87,39 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Video Demo
 
 - https://youtu.be/Y4UKeDV8vEY
+
+# Twitter API Integration
+
+This project includes a Twitter API integration that analyzes the freshness of Twitter activity for projects. 
+
+## Setup
+
+1. Add your Twitter API credentials to the `.env.local` file:
+
+```
+# Twitter API (RapidAPI)
+TWITTER_RAPIDAPI_KEY=a94785facfmsh8a58956c7a107a5p12f55djsn2cd3f46f9a6f
+TWITTER_RAPIDAPI_HOST=twitter241.p.rapidapi.com
+```
+
+## Testing
+
+You can test the Twitter API integration by visiting:
+```
+http://localhost:3000/api/twitter/test?username=MrBeast
+```
+
+Or fetch data for a specific Twitter user:
+```
+http://localhost:3000/api/twitter/MrBeast
+```
+
+## Freshness Classification
+
+The Twitter activity freshness is classified as:
+
+- **Active**: Tweeted within the last month
+- **Semi-active**: Tweeted within the last 3 months
+- **Inactive**: No tweets in over 3 months
+
+This classification is displayed in the project cards with color-coded indicators.

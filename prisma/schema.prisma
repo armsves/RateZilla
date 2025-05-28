@@ -24,10 +24,22 @@ model Project {
   votes         Vote[]
   comments      Comment[]
   metrics       ProjectMetrics?
+  categories    Category[]     @relation("ProjectCategories")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@map("projects")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  projects    Project[] @relation("ProjectCategories")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("categories")
 }
 
 model Contract {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { FaGithub, FaXTwitter } from 'react-icons/fa6';
 import { FaGlobe, FaCode, FaHashtag, FaStar } from 'react-icons/fa';
+import ProjectLogo from './ProjectLogo';
 
 interface Project {
   id: string;
@@ -13,6 +14,7 @@ interface Project {
   logoUrl: string;
   blockchain: string;
   averageRating: number;
+  categories?: { id: number, name: string }[];
   metrics: {
     githubStars: number;
     twitterFollowers: number;
@@ -26,6 +28,7 @@ interface SocialData {
   twitterLastUpdate?: string;
   mostRecentRepo?: string;
   repoCount?: number;
+  twitterFreshness?: string; // "active", "semi-active", or "inactive"
 }
 
 interface ProjectListProps {
@@ -186,7 +189,8 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
         if (response.ok) {
           const twitterData = await response.json();
           data.twitterLastUpdate = twitterData.lastUpdate;
-          console.log(`Twitter data fetched successfully for ${project.name}`);
+          data.twitterFreshness = twitterData.freshness;
+          console.log(`Twitter data fetched successfully for ${project.name}:`, twitterData);
         } else {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
           console.error(`Failed to fetch Twitter data for ${project.name}:`, errorData.error);
@@ -223,6 +227,13 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
   };
 
   const isSocialActive = (project: Project) => {
+    // Check if we have direct freshness data from the API
+    if (socialData[project.id]?.twitterFreshness) {
+      return socialData[project.id].twitterFreshness === 'active' || 
+             socialData[project.id].twitterFreshness === 'semi-active';
+    }
+    
+    // Fallback to checking date directly
     const threeMonthsAgo = new Date();
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
     const twitterDate = new Date(socialData[project.id]?.twitterLastUpdate || '');
@@ -251,6 +262,30 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
     }
   };
 
+  // Function to get category-specific colors
+  const getCategoryColor = (categoryName: string) => {
+    const name = categoryName.toLowerCase();
+    if (name.includes('defi') || name.includes('finance') || name.includes('lending')) {
+      return 'bg-green-100 text-green-800';
+    } else if (name.includes('dex') || name.includes('exchange') || name.includes('trading')) {
+      return 'bg-blue-100 text-blue-800';
+    } else if (name.includes('nft') || name.includes('gaming') || name.includes('art')) {
+      return 'bg-purple-100 text-purple-800';
+    } else if (name.includes('dao') || name.includes('governance')) {
+      return 'bg-orange-100 text-orange-800';
+    } else if (name.includes('wallet') || name.includes('infrastructure')) {
+      return 'bg-gray-100 text-gray-800';
+    } else if (name.includes('social') || name.includes('community')) {
+      return 'bg-pink-100 text-pink-800';
+    } else if (name.includes('analytics') || name.includes('data')) {
+      return 'bg-indigo-100 text-indigo-800';
+    } else if (name.includes('yield') || name.includes('farming') || name.includes('staking')) {
+      return 'bg-emerald-100 text-emerald-800';
+    } else {
+      return 'bg-slate-100 text-slate-800';
+    }
+  };
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -260,6 +295,7 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
         }
         const data = await response.json();
         setProjects(data);
+        console.log('data: ',data);
         
         // Fetch social data for each project
         data.forEach((project: Project) => {
@@ -351,11 +387,29 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
             </div>
             {/* Social Media Activity Indicator */}
             <div className="relative group">
-              {isSocialActive(project) ? (
+              {socialData[project.id]?.twitterFreshness === 'active' ? (
+                <FaHashtag className="h-5 w-5 text-green-500" title="Very active on social media (tweeted within the last month)" />
+              ) : socialData[project.id]?.twitterFreshness === 'semi-active' ? (
+                <FaHashtag className="h-5 w-5 text-blue-500" title="Semi-active on social media (tweeted in the last 3 months)" />
+              ) : socialData[project.id]?.twitterFreshness === 'inactive' ? (
+                <FaHashtag className="h-5 w-5 text-red-500" title="Inactive on social media (no tweets in over 3 months)" />
+              ) : isSocialActive(project) ? (
                 <FaHashtag className="h-5 w-5 text-blue-500" title="Active social media (updated in last 3 months)" />
               ) : (
                 <FaHashtag className="h-5 w-5 text-gray-400" title="Inactive social media (no updates in last 3 months)" />
               )}
+              <div className="absolute -top-2 right-6 hidden group-hover:block bg-gray-800 text-white text-xs p-2 rounded-md w-48 z-10">
+                {socialData[project.id]?.twitterFreshness === 'active' 
+                  ? "Very active: Tweeted within the last month"
+                  : socialData[project.id]?.twitterFreshness === 'semi-active'
+                    ? "Semi-active: Tweeted within the last 3 months"
+                    : socialData[project.id]?.twitterFreshness === 'inactive'
+                      ? "Inactive: No tweets in over 3 months"
+                      : isSocialActive(project)
+                        ? "Active: Posted on social media in the last 3 months"
+                        : "Inactive: No social media activity in the last 3 months"
+                }
+              </div>
             </div>
           </div>
           <div className="flex items-center space-x-4 mb-4">
@@ -374,7 +428,28 @@ const ProjectList = ({ blockchain = 'stellar' }: ProjectListProps) => {
                 <span className="text-gray-500 text-xl">{project.name[0]}</span>
               </div>
             )}
-            <h2 className="text-xl font-semibold">{project.name}</h2>
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold">{project.name}</h2>
+              
+              {/* Add cute categories below the project name */}
+              {project.categories && project.categories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {project.categories.slice(0, 3).map((category) => (
+                    <span 
+                      key={category.id}
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(category.name)}`}
+                    >
+                      {category.name}
+                    </span>
+                  ))}
+                  {project.categories.length > 3 && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                      +{project.categories.length - 3} more
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <p className="mt-2 text-sm text-foreground/80">{project.description}</p>
           

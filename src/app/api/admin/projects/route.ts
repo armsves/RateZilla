@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         githubUrl: body.githubUrl || null,
         twitterUrl: body.twitterUrl || null,
         logoUrl: body.logoUrl || null,
-        blockchain: 'stellar', // Always set to stellar
+        blockchain: body.blockchain || 'stellar',
         socialMetrics: {
           create: {
             githubStars: 0,
@@ -38,8 +38,16 @@ export async function POST(request: Request) {
             twitterFollowers: 0,
             projectFreshness: 0
           }
-        }
+        },
+        ...(body.categoryIds?.length && {
+          categories: {
+            connect: body.categoryIds.map((id: number) => ({ id }))
+          }
+        })
       },
+      include: {
+        categories: true
+      }
     });
 
     return NextResponse.json({ success: true, project }, { status: 201 });
@@ -68,6 +76,7 @@ export async function GET() {
       include: {
         socialMetrics: true,
         votes: true,
+        categories: true
       },
     });
 
@@ -114,8 +123,19 @@ export async function PUT(request: Request) {
         githubUrl: body.githubUrl || null,
         twitterUrl: body.twitterUrl || null,
         logoUrl: body.logoUrl || null,
-        blockchain: 'stellar', // Always set to stellar
+        blockchain: body.blockchain || 'stellar',
+        categories: {
+          // First disconnect all existing categories
+          set: [],
+          // Then connect the selected categories
+          ...(body.categoryIds?.length && {
+            connect: body.categoryIds.map((id: number) => ({ id }))
+          })
+        }
       },
+      include: {
+        categories: true
+      }
     });
     
     return NextResponse.json(updatedProject, { status: 200 });

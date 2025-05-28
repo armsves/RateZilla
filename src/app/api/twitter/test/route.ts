@@ -1,27 +1,17 @@
 import { NextResponse } from 'next/server';
 import TwitterService from '@/app/services/twitterService';
 
-interface TwitterResponse {
-  username: string;
-  lastUpdate: string | null;
-  followerCount: number;
-  tweetCount: number;
-  isActive: boolean;
-  freshness: string; // "active", "semi-active", or "inactive"
-  error?: string;
-}
-
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 // Track the last request time for additional rate limiting at the API level
 let lastRequestTime = 0;
 const minRequestDelay = 3000; // 3 seconds minimum between API endpoint calls
 
-export async function GET(
-  request: Request,
-  { params }: { params: { username: string } }
-) {
+/**
+ * Test endpoint for Twitter API
+ * Usage: /api/twitter/test?username=MrBeast
+ */
+export async function GET(request: Request) {
   try {
     // Add rate limiting at the API endpoint level
     const now = Date.now();
@@ -36,21 +26,11 @@ export async function GET(
     // Update last request time
     lastRequestTime = Date.now();
     
-    let username = params.username;
+    // Get the username from the query string
+    const { searchParams } = new URL(request.url);
+    const username = searchParams.get('username') || 'MrBeast';
     
-    if (!username) {
-      return NextResponse.json(
-        { error: 'Twitter username is required' },
-        { status: 400 }
-      );
-    }
-    
-    // Strip @ symbol if present
-    if (username.startsWith('@')) {
-      username = username.substring(1);
-    }
-    
-    console.log(`Twitter API: Fetching data for ${username}`);
+    console.log(`Twitter API Test: Fetching data for ${username}`);
     
     // Get tweets and user data
     const userData = await TwitterService.getUserTweets(username);
@@ -86,25 +66,26 @@ export async function GET(
       // Otherwise it's inactive (no tweets in 3+ months)
     }
     
-    const response: TwitterResponse = {
+    const response = {
       username: userData.username,
       lastUpdate: userData.lastTweetDate ? userData.lastTweetDate.toISOString() : null,
       followerCount: userData.followerCount,
       tweetCount: userData.tweetCount,
       isActive: userData.isActive,
-      freshness
+      freshness,
+      message: 'Twitter API test successful!'
     };
     
     return NextResponse.json(response);
     
   } catch (error) {
-    console.error('Twitter API error:', error);
+    console.error('Twitter API Test error:', error);
     
     // Add a delay before responding with an error
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     return NextResponse.json(
-      { error: 'Failed to fetch Twitter data' },
+      { error: 'Failed to fetch Twitter data', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
