@@ -10,6 +10,8 @@ import { useAppContext } from '@/app/context';
 import { Horizon } from '@stellar/stellar-sdk';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const kit = new StellarWalletsKit({
   network: WalletNetwork.TESTNET,
@@ -29,6 +31,7 @@ export interface ISupportedWallet {
 const WalletConnect = () => {
   const { activePubKey, setActivePubKey, setBalance } = useAppContext();
   const [isConnecting, setIsConnecting] = useState(false);
+  const pathname = usePathname();
 
   const getBalance = async () => {
     if (activePubKey) {
@@ -86,6 +89,18 @@ const WalletConnect = () => {
     toast.info('Wallet disconnected');
   };
 
+  // Get the current blockchain from the pathname
+  const getCurrentBlockchain = () => {
+    if (pathname.startsWith('/stellar')) return 'stellar';
+    if (pathname.startsWith('/aptos')) return 'aptos';
+    if (pathname.startsWith('/bahamut')) return 'bahamut';
+    if (pathname.startsWith('/polkadot')) return 'polkadot';
+    return 'stellar'; // Default to stellar
+  };
+
+  const blockchain = getCurrentBlockchain();
+  const historyPath = `/${blockchain}/wallet-history`;
+
   return (
     <div>
       {!activePubKey ? (
@@ -101,6 +116,12 @@ const WalletConnect = () => {
           <span className="text-sm text-gray-600">
             {activePubKey.slice(0, 6)}...{activePubKey.slice(-4)}
           </span>
+          <Link 
+            href={historyPath}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 min-w-[120px] text-center"
+          >
+            View History
+          </Link>
           <button
             onClick={disconnectWallet}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 min-w-[120px]"
